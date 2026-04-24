@@ -10,3 +10,4 @@ faiss-cpu>=1.7.4
 dataclasses-json>=0.6.7
 pydantic-settings>=2.14.0
 httpx-sse>=0.4.0
+pyyaml>=6.0.0

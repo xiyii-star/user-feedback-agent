@@ -9,8 +9,9 @@ from tools import (
 )
 from agent.sub_agents import UnderstandingAgent, ReplyAgent, ExecutionAgent
 from agent.memory import UserMemory
+from agent.template_manager import CommandManager, SkillManager
 import json
-from typing import Dict
+from typing import Dict, List
 
 class MainAgent:
     """主Agent：负责整体编排和决策"""
@@ -31,6 +32,13 @@ class MainAgent:
 
         # 初始化记忆
         self.memory = UserMemory()
+
+        # 初始化 Command 和 Skill 管理器
+        self.command_manager = CommandManager()
+        self.skill_manager = SkillManager(llm=self.llm)
+
+        # 注册技能为工具
+        self.skill_tools = self.skill_manager.register_skills_as_tools()
 
     def process_feedback(self, feedback: str, user_id: str = "default") -> Dict:
         """
@@ -109,3 +117,28 @@ class MainAgent:
         self.memory.update_user_history(user_id, category, should_transfer)
 
         return result
+
+    def execute_command(self, command_name: str, **kwargs) -> str:
+        """
+        执行用户命令
+
+        参数:
+            command_name: 命令名称（不含 /）
+            **kwargs: 命令所需参数
+
+        返回:
+            命令执行结果
+        """
+        return self.command_manager.execute_command(command_name, self.llm, **kwargs)
+
+    def list_commands(self) -> List[str]:
+        """列出所有可用命令"""
+        return self.command_manager.list_commands()
+
+    def list_skills(self) -> List[str]:
+        """列出所有可用技能"""
+        return self.skill_manager.list_skills()
+
+    def get_skill_tools(self) -> list:
+        """获取技能工具列表（供 Agent 调用）"""
+        return self.skill_tools

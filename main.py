@@ -33,6 +33,9 @@ def interactive_mode(agent: MainAgent):
     print("\n欢迎使用用户反馈智能处理系统")
     print("输入 'quit' 或 'exit' 退出")
     print("输入 'history' 查看会话记忆")
+    print("输入 'commands' 查看可用命令")
+    print("输入 'skills' 查看可用技能")
+    print("输入 '/命令名' 执行命令")
     print("-" * 60)
 
     user_id = input("\n请输入用户ID（默认: default）: ").strip() or "default"
@@ -49,6 +52,38 @@ def interactive_mode(agent: MainAgent):
             print("\n=== 会话记忆 ===")
             for i, mem in enumerate(history, 1):
                 print(f"{i}. {mem['feedback'][:50]}... (分类: {mem['result'].get('分类', '未知')})")
+            continue
+
+        if feedback.lower() == 'commands':
+            print("\n=== 可用命令 ===")
+            for cmd in agent.list_commands():
+                print(f"  {cmd}")
+            continue
+
+        if feedback.lower() == 'skills':
+            print("\n=== 可用技能 ===")
+            for skill in agent.list_skills():
+                print(f"  {skill}")
+            continue
+
+        # 处理命令调用
+        if feedback.startswith('/'):
+            command_parts = feedback[1:].split()
+            command_name = command_parts[0]
+
+            # 获取命令参数
+            print(f"\n执行命令: {command_name}")
+            # 简单示例：从最近的反馈获取参数
+            recent_feedback = ""
+            history = agent.memory.get_session_memory()
+            if history:
+                recent_feedback = history[-1]['feedback']
+
+            try:
+                result = agent.execute_command(command_name, feedback=recent_feedback)
+                print(f"\n命令结果:\n{result}")
+            except Exception as e:
+                print(f"\n命令执行失败: {str(e)}")
             continue
 
         if not feedback:
