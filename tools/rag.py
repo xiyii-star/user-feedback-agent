@@ -1,7 +1,7 @@
 from langchain.tools import tool
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
 import os
 
 # 全局变量存储向量数据库
